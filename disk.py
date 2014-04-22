@@ -1,4 +1,4 @@
-from math import sqrt
+from math import sqrt, pi
 
 class Disk:
     def __init__(self, center, radius, material, velocity=(0, 0)):
@@ -6,6 +6,14 @@ class Disk:
         self.radius = radius
         self.material = material
         self.velocity = velocity
+
+    @property
+    def surface(self):
+        return pi * self.radius ** 2
+
+    @property
+    def mass(self):
+        return self.surface * self.material.density
 
     def isInContact(self, disk):
         distance = sqrt((self.center[0] - disk.center[0]) ** 2 +
