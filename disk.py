@@ -19,3 +19,6 @@ class Disk:
         distance = sqrt((self.center[0] - disk.center[0]) ** 2 +
                         (self.center[1] - disk.center[1]) ** 2)
         return distance <= self.radius + disk.radius
+
+    def updatePosition(self):
+        pass

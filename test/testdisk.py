@@ -13,9 +13,13 @@ class TestDisk(unittest.TestCase):
         self.disk3 = Disk((120, 130), 30, self.material)
         self.disk4 = Disk((150, 150), 30, self.material)
 
-    def test_contact(self):
+    def test_contact_with_touching_disk(self):
         self.assertTrue(self.disk1.isInContact(self.disk2))
+
+    def test_contact_with_overlapping_disk(self):
         self.assertTrue(self.disk1.isInContact(self.disk3))
+
+    def test_contact_with_non_touching_disk(self):
         self.assertFalse(self.disk1.isInContact(self.disk4))
 
     def test_surface(self):
@@ -28,5 +32,18 @@ class TestDisk(unittest.TestCase):
             self.disk1.mass,
             self.disk1.surface * self.disk1.material.density)
 
+    def test_total_force(self):
+        pass
+
     def test_update_velocity(self):
         pass
+
+    def test_update_position(self):
+        self.disk1.velocity = (2, 3)
+
+        dt = 0.1
+        pos = self.disk1.center
+        destination = pos[0] + 2 * dt, pos[1] + 3 * dt
+        self.disk1.updatePosition()
+        self.assertAlmostEqual(destination[0], self.disk1.center[0])
+        self.assertAlmostEqual(destination[1], self.disk1.center[1])
