@@ -36,7 +36,6 @@ dt = 0
 while True:
     window_surface.fill(blue)
 
-    #pygame.draw.circle(window_surface, white, (300, 50), 20, 0)
     c1.update(dt)
     c1.draw(window_surface)
 
@@ -46,6 +45,16 @@ while True:
             pygame.quit()
             sys.exit()
         elif event.type == KEYDOWN:
+            if event.key == K_LEFT:
+                c1.v = c1.v[0] - .1, c1.v[1]
+            if event.key == K_RIGHT:
+                c1.v = c1.v[0] + .1, c1.v[1]
+            if event.key == K_UP:
+                c1.v = c1.v[0], c1.v[1] - .1
+            if event.key == K_DOWN:
+                c1.v = c1.v[0], c1.v[1] + .1
+            c1.v = round(c1.v[0], 4), round(c1.v[1], 4)
+            print "New speed:", c1.v
             if event.key == K_q:
                 pygame.event.post(pygame.event.Event(QUIT))
 
