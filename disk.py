@@ -20,5 +20,18 @@ class Disk:
                         (self.center[1] - disk.center[1]) ** 2)
         return distance <= self.radius + disk.radius
 
+    def isInCollision(self, disk):
+        # The vector from the center of the other disk to the center
+        # of this disk.
+        centers_vector = disk.center - self.center
+
+        # The ralative velocity of the two disks.
+        vr = disk.velocity - self.velocity
+
+        # The component of the relative velocity along centers_vector.
+        comp = vr * centers_vector / len(centers_vector)
+
+        return self.isInContact(disk) and comp > 0
+
     def updatePosition(self):
         pass

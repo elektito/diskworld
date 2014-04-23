@@ -22,6 +22,51 @@ class TestDisk(unittest.TestCase):
     def test_contact_with_non_touching_disk(self):
         self.assertFalse(self.disk1.isInContact(self.disk4))
 
+    def test_collision_with_touching_object_moving_against(self):
+        self.disk1.velocity = (1, 1)
+        self.disk2.velocity = (-1, -1)
+        self.assertTrue(self.disk1.isInCollision(self.disk2))
+
+    def test_collision_with_touching_object_at_rest(self):
+        self.disk1.velocity = (1, 1)
+        self.disk2.velocity = (0, 0)
+        self.assertTrue(self.disk1.isInCollision(self.disk3))
+
+    def test_collision_with_touching_object_moving_alongside(self):
+        self.disk1.velocity = (1, 1)
+        self.disk2.velocity = (1, 1)
+        self.assertFalse(self.disk1.isInCollision(self.disk4))
+
+    def test_collision_with_overlapping_object_moving_against(self):
+        self.disk1.velocity = (1, 1)
+        self.disk2.velocity = (-1, -1)
+        self.assertTrue(self.disk1.isInCollision(self.disk3))
+
+    def test_collision_with_overlapping_object_at_rest(self):
+        self.disk1.velocity = (1, 1)
+        self.disk2.velocity = (0, 0)
+        self.assertTrue(self.disk1.isInCollision(self.disk3))
+
+    def test_collision_with_overlapping_object_moving_alongside(self):
+        self.disk1.velocity = (1, 1)
+        self.disk2.velocity = (1, 1)
+        self.assertFalse(self.disk1.isInCollision(self.disk3))
+
+    def test_collision_with_non_touching_object_moving_against(self):
+        self.disk1.velocity = (1, 1)
+        self.disk2.velocity = (-1, -1)
+        self.assertFalse(self.disk1.isInCollision(self.disk4))
+
+    def test_collision_with_non_touching_object_at_rest(self):
+        self.disk1.velocity = (1, 1)
+        self.disk2.velocity = (0, 0)
+        self.assertFalse(self.disk1.isInCollision(self.disk4))
+
+    def test_collision_with_non_touching_object_moving_alongside(self):
+        self.disk1.velocity = (1, 1)
+        self.disk2.velocity = (1, 1)
+        self.assertFalse(self.disk1.isInCollision(self.disk4))
+
     def test_surface(self):
         self.assertAlmostEqual(
             self.disk1.surface,
