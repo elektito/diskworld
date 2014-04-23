@@ -4,6 +4,23 @@ from vector import Vector
 from point import Point
 
 class TestVector(unittest.TestCase):
+    def test_accessors(self):
+        v = Vector(11, 12)
+        self.assertEqual(v.x, 11)
+        self.assertEqual(v.y, 12)
+        self.assertEqual(v[0], 11)
+        self.assertEqual(v[1], 12)
+
+        v[0] = 13
+        self.assertEqual(v.x, 13)
+        v[1] = -7
+        self.assertEqual(v.y, -7)
+
+        v.x = 1
+        self.assertEqual(v[0], 1)
+        v.y = 0
+        self.assertEqual(v[1], 0)
+
     def test_equality(self):
         v1 = Vector(1.000000001, 2.333)
         v2 = Vector(1.000000002, 2.333)
@@ -35,18 +52,30 @@ class TestVector(unittest.TestCase):
         result = 3 * 9 + 7 * 11
         self.assertEqual(v1 * v2, result)
 
+    def test_multiplication_with_scalar(self):
+        v = Vector(4, 5)
+        scalar = 2
+        result = Vector(8, 10)
+        self.assertEqual(v * scalar, result)
+
     def test_length(self):
-        v = (3, 4)
+        v = Vector(3, 4)
         result = 5
-        self.assertEqual(len(v), result)
+        self.assertEqual(v.magnitude, result)
 
     def test_angle(self):
         v1 = Vector(1, 1)
         v2 = Vector(1, tan(pi / 6))
-        v3 = Vector(1, 0)
-        self.assertAlmsotEqual(v1.theta, pi / 4)
-        self.assertAlmsotEqual(v2.theta, pi / 6)
-        self.assertAlmsotEqual(v3.theta, pi / 2)
+        v3 = Vector(0, 1)
+        v4 = Vector(-1, -1)
+        self.assertAlmostEqual(v1.angle, pi / 4)
+        self.assertAlmostEqual(v2.angle, pi / 6)
+        self.assertAlmostEqual(v3.angle, pi / 2)
+        self.assertAlmostEqual(v4.angle, pi * -0.75)
 
     def test_projection(self):
+        v1 = Vector(1, 2)
+        v2 = Vector(3, 4)
+        #result = 9 / 5 * Vector(3, 4)
+        result = Vector(33.0 / 25, 44.0 / 25)
         self.assertEqual(v1.project(v2), result)
