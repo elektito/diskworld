@@ -33,5 +33,5 @@ class Disk:
 
         return self.isInContact(disk) and comp > 0
 
-    def updatePosition(self):
+    def updatePosition(self, dt):
         pass

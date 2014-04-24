@@ -91,6 +91,6 @@ class TestDisk(unittest.TestCase):
         dt = 0.1
         pos = self.disk1.center
         destination = pos[0] + 2 * dt, pos[1] + 3 * dt
-        self.disk1.updatePosition()
+        self.disk1.updatePosition(dt)
         self.assertAlmostEqual(destination[0], self.disk1.center[0])
         self.assertAlmostEqual(destination[1], self.disk1.center[1])
