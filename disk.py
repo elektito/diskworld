@@ -29,7 +29,7 @@ class Disk:
         vr = disk.velocity - self.velocity
 
         # The component of the relative velocity along centers_vector.
-        comp = vr * centers_vector / len(centers_vector)
+        comp = vr * centers_vector / centers_vector.magnitude
 
         return self.isInContact(disk) and comp > 0
 
