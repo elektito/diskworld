@@ -1,18 +1,26 @@
-import math
+from math import sqrt, atan2, sin, cos
 from numbers import Number
 
 class Vector:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+    def __init__(self, x=None, y=None, magnitude=None, angle=None):
+        if x is not None and y is not None:
+            self.x = x
+            self.y = y
+        elif magnitude is not None and angle is not None:
+            self.x = magnitude * cos(angle)
+            self.y = magnitude * sin(angle)
+        else:
+            raise TypeError(
+                "Either cartesian or polar coordinates must be"
+                "specified when creating a vector.")
 
     @property
     def magnitude(self):
-        return math.sqrt(self.x ** 2 + self.y ** 2)
+        return sqrt(self.x ** 2 + self.y ** 2)
 
     @property
     def angle(self):
-        return math.atan2(self.y, self.x)
+        return atan2(self.y, self.x)
 
     def project(self, v):
         return v * (self * v / v.magnitude ** 2)

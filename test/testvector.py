@@ -1,5 +1,5 @@
 import unittest
-from math import pi, tan
+from math import pi, tan, sin, cos
 from vector import Vector
 from point import Point
 
@@ -20,6 +20,15 @@ class TestVector(unittest.TestCase):
         self.assertEqual(v[0], 1)
         v.y = 0
         self.assertEqual(v[1], 0)
+
+    def test_init_with_polar_coordintates(self):
+        v1 = Vector(magnitude=2, angle=pi/3)
+        v2 = Vector(2*cos(pi/3), 2*sin(pi/3))
+        self.assertEqual(v1, v2)
+
+    def test_invalid_initialization(self):
+        with self.assertRaises(TypeError):
+            v = Vector()
 
     def test_equality(self):
         v1 = Vector(1.000000001, 2.333)
