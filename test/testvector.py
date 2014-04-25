@@ -67,6 +67,17 @@ class TestVector(unittest.TestCase):
         result = Vector(8, 10)
         self.assertEqual(v * scalar, result)
 
+    def test_division_by_scalar(self):
+        v = Vector(8, 4)
+        scalar = 2
+        result = Vector(4, 2)
+        self.assertEqual(v / scalar, result)
+
+    def test_negation(self):
+        v = Vector(4, -3)
+        result = Vector(-4, 3)
+        self.assertEqual(-v, result)
+
     def test_length(self):
         v = Vector(3, 4)
         result = 5

@@ -63,5 +63,11 @@ class Vector:
         else:
             return Vector(self.x * arg, self.y * arg)
 
+    def __div__(self, scalar):
+        return self * (1.0 / scalar)
+
+    def __neg__(self):
+        return self * -1
+
     def __repr__(self):
         return "<Vector ({}, {})>".format(self.x, self.y)

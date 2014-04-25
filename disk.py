@@ -1,19 +1,16 @@
 from math import sqrt, pi
 
 class Disk:
-    def __init__(self, center, radius, material, velocity=(0, 0)):
+    def __init__(self, center, radius, mass, color, velocity=(0, 0)):
         self.center = center
         self.radius = radius
-        self.material = material
         self.velocity = velocity
+        self.mass = mass
+        self.color = color
 
     @property
     def surface(self):
         return pi * self.radius ** 2
-
-    @property
-    def mass(self):
-        return self.surface * self.material.density
 
     def isInContact(self, disk):
         distance = sqrt((self.center[0] - disk.center[0]) ** 2 +
@@ -34,4 +31,8 @@ class Disk:
         return self.isInContact(disk) and comp > 0
 
     def updatePosition(self, dt):
-        pass
+        self.center.x += self.velocity.x * dt
+        self.center.y += self.velocity.y * dt
+
+    def __repr__(self):
+        return "<Disk mass={} radius={} color={}>".format(self.mass, self.radius, self.color)
