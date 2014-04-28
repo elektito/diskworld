@@ -63,6 +63,9 @@ class Vector:
         else:
             return Vector(self.x * arg, self.y * arg)
 
+    def __rmul__(self, arg):
+        return Vector(self.x * arg, self.y * arg)
+
     def __div__(self, scalar):
         return self * (1.0 / scalar)
 

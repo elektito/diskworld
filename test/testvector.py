@@ -67,6 +67,12 @@ class TestVector(unittest.TestCase):
         result = Vector(8, 10)
         self.assertEqual(v * scalar, result)
 
+    def test_reverse_multiplication_with_scalar(self):
+        v = Vector(4, 5)
+        scalar = 2
+        result = Vector(8, 10)
+        self.assertEqual(scalar * v, result)
+
     def test_division_by_scalar(self):
         v = Vector(8, 4)
         scalar = 2
