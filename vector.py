@@ -72,5 +72,8 @@ class Vector:
     def __neg__(self):
         return self * -1
 
+    def __abs__(self):
+        return self.magnitude
+
     def __repr__(self):
         return "<Vector ({}, {})>".format(self.x, self.y)

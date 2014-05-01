@@ -89,6 +89,11 @@ class TestVector(unittest.TestCase):
         result = 5
         self.assertEqual(v.magnitude, result)
 
+    def test_absolute(self):
+        v = Vector(3, 4)
+        result = 5
+        self.assertEqual(abs(v), result)
+
     def test_angle(self):
         v1 = Vector(1, 1)
         v2 = Vector(1, tan(pi / 6))
