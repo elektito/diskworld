@@ -1,19 +1,26 @@
 import unittest
+import pygame
 from math import pi
 from disk import Disk
 from vector import Vector
 from point import Point
-from materialdb import TestMaterialDatabase
+
+WHITE = pygame.Color(255, 255, 255)
 
 class TestDisk(unittest.TestCase):
     def setUp(self):
-        mdb = TestMaterialDatabase()
-        self.material = mdb.testMaterial1
+        self.disk1 = Disk(Point(100, 100), 20, 1, WHITE)
+        self.disk2 = Disk(Point(130, 140), 30, 1, WHITE)
+        self.disk3 = Disk(Point(120, 130), 30, 1, WHITE)
+        self.disk4 = Disk(Point(150, 150), 30, 1, WHITE)
 
-        self.disk1 = Disk(Point(100, 100), 20, self.material)
-        self.disk2 = Disk(Point(130, 140), 30, self.material)
-        self.disk3 = Disk(Point(120, 130), 30, self.material)
-        self.disk4 = Disk(Point(150, 150), 30, self.material)
+    def test_invalid_center(self):
+        with self.assertRaises(TypeError):
+            d = Disk((10, 10), 20, 1, WHITE)
+
+    def test_invalid_velocity(self):
+        with self.assertRaises(TypeError):
+            d = Disk(Point(10, 10), 20, 1, WHITE, (1, 1))
 
     def test_contact_with_touching_disk(self):
         self.assertTrue(self.disk1.isInContact(self.disk2))
@@ -73,11 +80,6 @@ class TestDisk(unittest.TestCase):
         self.assertAlmostEqual(
             self.disk1.surface,
             pi * self.disk1.radius ** 2)
-
-    def test_mass(self):
-        self.assertAlmostEqual(
-            self.disk1.mass,
-            self.disk1.surface * self.disk1.material.density)
 
     def test_total_force(self):
         pass

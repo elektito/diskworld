@@ -1,7 +1,15 @@
 from math import sqrt, pi
+from vector import Vector
+from point import Point
 
 class Disk:
-    def __init__(self, center, radius, mass, color, velocity=(0, 0)):
+    def __init__(self, center, radius, mass, color, velocity=Vector(0, 0)):
+        if not isinstance(center, Point):
+            raise TypeError('Disk center must be a point.')
+
+        if not isinstance(velocity, Vector):
+            raise TypeError('Disk velocity must be a vector.')
+
         self.center = center
         self.radius = radius
         self.velocity = velocity
