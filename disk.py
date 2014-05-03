@@ -16,6 +16,10 @@ class Disk:
         self.mass = mass
         self.color = color
 
+        self.force = Vector(0, 0)
+        self.acceleration = Vector(0, 0)
+        self.collisions = []
+
     @property
     def surface(self):
         return pi * self.radius ** 2
