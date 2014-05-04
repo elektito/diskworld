@@ -25,9 +25,9 @@ class Disk:
         return pi * self.radius ** 2
 
     def isInContact(self, disk):
-        distance = sqrt((self.center[0] - disk.center[0]) ** 2 +
-                        (self.center[1] - disk.center[1]) ** 2)
-        return distance <= self.radius + disk.radius
+        distance = round(abs(self.center - disk.center))
+        R = round(self.radius + disk.radius)
+        return distance <= R
 
     def isInCollision(self, disk):
         # The vector from the center of the other disk to the center
