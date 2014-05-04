@@ -48,6 +48,24 @@ def velocitiesAfterCollision(disk1, disk2):
     return nv1, nv2
 
 def calculateCollision(disk1, disk2, dt):
+    # The vector from the center of the other disk to the center of
+    # this disk.
+    centers_vector = disk2.center - disk1.center
+
+    # The ralative velocity of the two disks.
+    vr = disk2.velocity - disk1.velocity
+
+    # The component of the relative velocity along centers_vector.
+    comp = vr * centers_vector / centers_vector.magnitude
+
+    #if comp <= 0:
+    #if (disk2.center.x - disk1.center.x) * (disk1.velocity.x - disk2.velocity.x) + \
+    #   (disk2.center.y - disk1.center.y) * (disk1.velocity.y - disk2.velocity.y) <= 0:
+    if vr * centers_vector > 0:
+        print "XXXXX", comp, disk1.center, disk1.velocity, disk2.center, disk2.velocity
+        return None
+
+
     R = disk1.radius + disk2.radius
     dv = disk2.velocity - disk1.velocity
     dr = disk2.center - disk1.center
@@ -86,8 +104,7 @@ class World:
             d.force = Vector(0, 0)
             d.collisions = []
 
-        print "masses:", [d.mass for d in self.disks]
-
+        print
         print "force before:", [d.force for d in self.disks]
         # Calculate non-contact forces
         for d1, d2 in itertools.combinations(self.disks, 2):
@@ -103,9 +120,12 @@ class World:
         for d1, d2 in itertools.combinations(self.disks, 2):
             # normal force
             if d1.isInContact(d2):
+                print "NNNNNNNNNNNNNNNNNN"
                 fy = d1.force.project(d2.center - d1.center)
                 d1.force -= fy
                 d2.force += fy
+            else:
+                print "UUUUUUUUUUUUUUUUUUUUUN"
         print "force after:", [d.force for d in self.disks]
 
         print "accel. before:", [d.acceleration for d in self.disks]
@@ -154,8 +174,22 @@ class World:
         # Move the disks
         for d in self.disks:
             if len(d.collisions) > 0:
+                # Move the disk to where the collisions occurs
+                d.center += d.velocity * d.collisions[0].toi
+
+                # Apply the impulses caused by the collisions
                 for c in d.collisions:
-                    d.velocity += c.disk1DeltaV * dt if d == c.disk1 else c.disk2DeltaV * dt
-            d.center += d.velocity * dt
+                    d.velocity += c.disk1DeltaV if c.disk1 == d else c.disk2DeltaV
+            else:
+                d.center += d.velocity * dt
         print "pos. after:", [d.center for d in self.disks]
         print "vel. after:", [d.velocity for d in self.disks]
+        for d in self.disks:
+            if len(d.collisions) > 0:
+                if not d.isInContact(c.disk1 if c.disk2 == d else c.disk2):
+                    print "FOOOOOOUUUUL: Collision detected, but no contact!"
+                    exit(0)
+        for d1, d2 in itertools.combinations(self.disks, 2):
+            if abs(d2.center - d1.center) - (d1.radius + d2.radius) < 0.000001:
+                print "NOOOOOOOOOOOOOO!", abs(d2.center - d1.center), d1.radius + d2.radius, d1.collisions, d2.collisions
+                #exit(0)

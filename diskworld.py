@@ -118,7 +118,6 @@ dt = 0
 while True:
     window_surface.fill(blue)
 
-    #world.update(dt / 1000.0)
     renderer.update()
 
     for event in pygame.event.get():
@@ -142,3 +141,4 @@ while True:
 
     pygame.display.update()
     dt = fps_clock.tick(30)
+    #world.update(dt / 1000.0)
