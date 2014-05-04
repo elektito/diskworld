@@ -3,15 +3,15 @@ from math import sqrt
 from vector import Vector
 
 class Collision:
-    def __init__(self):
+    def __init__(self, disk, otherDisk):
+        self.disk = disk
+        self.other = otherDisk
+
         self.toi = 0 # time of impact
-        self.disk1 = None
-        self.disk2 = None
-        self.disk1DeltaV = Vector(0, 0)
-        self.disk2DeltaV = Vector(0, 0)
+        self.dv = Vector(0, 0)
 
     def __repr__(self):
-        return '<Collision toi={} dv1={} dv2={}>'.format(self.toi, self.disk1DeltaV, self.disk2DeltaV)
+        return '<Collision toi={} dv={}>'.format(self.toi, self.dv)
 
 def velocitiesAfterCollision(disk1, disk2):
     # Calculate collision impulse from conservation of momentum and
@@ -63,7 +63,7 @@ def calculateCollision(disk1, disk2, dt):
     #   (disk2.center.y - disk1.center.y) * (disk1.velocity.y - disk2.velocity.y) <= 0:
     if vr * centers_vector > 0:
         print "XXXXX", comp, disk1.center, disk1.velocity, disk2.center, disk2.velocity
-        return None
+        return None, None
 
 
     R = disk1.radius + disk2.radius
@@ -76,24 +76,21 @@ def calculateCollision(disk1, disk2, dt):
     t1 = t1 if 0 < t1 <= dt else None
     t2 = t2 if 0 < t2 <= dt else None
 
-    c = Collision()
+    c1, c2 = Collision(disk1, disk2), Collision(disk2, disk1)
     if t1 is None and t2 is None:
-        return None
+        return None, None
     elif t1 is None and t2 is not None:
-        c.toi = t2
+        c1.toi = c2.toi = t2
     elif t2 is None and t1 is not None:
-        c.toi = t1
+        c1.toi = c2.toi = t1
     else:
-        c.toi = min(t1, t2)
-
-    c.disk1 = disk1
-    c.disk2 = disk2
+        c1.toi = c2.toi = min(t1, t2)
 
     v1, v2 = velocitiesAfterCollision(disk1, disk2)
-    c.disk1DeltaV = v1 - disk1.velocity
-    c.disk2DeltaV = v2 - disk2.velocity
+    c1.dv = v1 - disk1.velocity
+    c2.dv = v2 - disk2.velocity
 
-    return c
+    return c1, c2
 
 class World:
     def __init__(self):
@@ -143,10 +140,10 @@ class World:
         print "cols. before:", [d.collisions for d in self.disks]
         # Calculate collisions
         for d1, d2 in itertools.combinations(self.disks, 2):
-            collision = calculateCollision(d1, d2, dt)
-            if collision is not None:
-                d1.collisions.append(collision)
-                d2.collisions.append(collision)
+            c1, c2 = calculateCollision(d1, d2, dt)
+            if c1 is not None:
+                d1.collisions.append(c1)
+                d2.collisions.append(c2)
         print "cols. after:", [d.collisions for d in self.disks]
 
         print "cols.before:", [d.collisions for d in self.disks]
@@ -166,8 +163,7 @@ class World:
                 rest = d.collisions[i:]
                 d.collisions = d.collisions[:i]
                 for c in rest:
-                    other = c.disk1 if c.disk2 == d else c.disk2
-                    other.collisions.remove(c)
+                    c.other.collisions.remove(c)
         print "cols. after:", [d.collisions for d in self.disks]
 
         print "pos. before:", [d.center for d in self.disks]
@@ -179,14 +175,14 @@ class World:
 
                 # Apply the impulses caused by the collisions
                 for c in d.collisions:
-                    d.velocity += c.disk1DeltaV if c.disk1 == d else c.disk2DeltaV
+                    d.velocity += c.dv
             else:
                 d.center += d.velocity * dt
         print "pos. after:", [d.center for d in self.disks]
         print "vel. after:", [d.velocity for d in self.disks]
         for d in self.disks:
             if len(d.collisions) > 0:
-                if not d.isInContact(c.disk1 if c.disk2 == d else c.disk2):
+                if not d.isInContact(c.other):
                     print "FOOOOOOUUUUL: Collision detected, but no contact!"
                     exit(0)
         for d1, d2 in itertools.combinations(self.disks, 2):
