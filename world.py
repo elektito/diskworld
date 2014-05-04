@@ -10,6 +10,9 @@ class Collision:
         self.disk1DeltaV = Vector(0, 0)
         self.disk2DeltaV = Vector(0, 0)
 
+    def __repr__(self):
+        return '<Collision toi={} dv1={} dv2={}>'.format(self.toi, self.disk1DeltaV, self.disk2DeltaV)
+
 def velocitiesAfterCollision(disk1, disk2):
     # Calculate collision impulse from conservation of momentum and
     # conservation of energy. Look at this for details:
@@ -83,6 +86,9 @@ class World:
             d.force = Vector(0, 0)
             d.collisions = []
 
+        print "masses:", [d.mass for d in self.disks]
+
+        print "force before:", [d.force for d in self.disks]
         # Calculate non-contact forces
         for d1, d2 in itertools.combinations(self.disks, 2):
             # gravity
@@ -90,7 +96,9 @@ class World:
             fg = (G * d1.mass * d2.mass) / (d2.center - d1.center).magnitude ** 2
             d1.force = Vector(angle=(d2.center - d1.center).angle, magnitude=fg)
             d2.force = Vector(angle=(d1.center - d2.center).angle, magnitude=fg)
+        print "force after:", [d.force for d in self.disks]
 
+        print "force before:", [d.force for d in self.disks]
         # Calculate contact forces
         for d1, d2 in itertools.combinations(self.disks, 2):
             # normal force
@@ -98,22 +106,30 @@ class World:
                 fy = d1.force.project(d2.center - d1.center)
                 d1.force -= fy
                 d2.force += fy
+        print "force after:", [d.force for d in self.disks]
 
+        print "accel. before:", [d.acceleration for d in self.disks]
         # Calculate accelerations
         for d in self.disks:
             d.acceleration = d.force * (1.0 / d.mass)
+        print "accel. after:", [d.acceleration for d in self.disks]
 
+        print "vel. before:", [d.velocity for d in self.disks]
         # Calculate velocities
         for d in self.disks:
             d.velocity += d.acceleration * dt
+        print "vel. after:", [d.velocity for d in self.disks]
 
+        print "cols. before:", [d.collisions for d in self.disks]
         # Calculate collisions
         for d1, d2 in itertools.combinations(self.disks, 2):
             collision = calculateCollision(d1, d2, dt)
             if collision is not None:
                 d1.collisions.append(collision)
                 d2.collisions.append(collision)
+        print "cols. after:", [d.collisions for d in self.disks]
 
+        print "cols.before:", [d.collisions for d in self.disks]
         # Prune extra collisions; that is, remove collisions that are
         # happen after another collision and therefore will never
         # happen.
@@ -132,10 +148,14 @@ class World:
                 for c in rest:
                     other = c.disk1 if c.disk2 == d else c.disk2
                     other.collisions.remove(c)
+        print "cols. after:", [d.collisions for d in self.disks]
 
+        print "pos. before:", [d.center for d in self.disks]
         # Move the disks
         for d in self.disks:
             if len(d.collisions) > 0:
                 for c in d.collisions:
-                    d.velocity += c.disk1DeltaV if d == c.disk1 else c.disk2DeltaV
+                    d.velocity += c.disk1DeltaV * dt if d == c.disk1 else c.disk2DeltaV * dt
             d.center += d.velocity * dt
+        print "pos. after:", [d.center for d in self.disks]
+        print "vel. after:", [d.velocity for d in self.disks]

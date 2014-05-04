@@ -127,7 +127,7 @@ while True:
             pygame.quit()
             sys.exit()
         elif event.type == KEYDOWN:
-            world.update(dt)
+            world.update(dt / 1000.0)
             if event.key == K_LEFT:
                 d1.velocity.x -= 0.5
             if event.key == K_RIGHT:
