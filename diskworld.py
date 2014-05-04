@@ -20,7 +20,7 @@ red = pygame.Color(255, 0, 0)
 green = pygame.Color(0, 255, 0)
 blue = pygame.Color(0, 0, 255)
 
-class World:
+class WorldX:
     def __init__(self, width, height, screen, disks):
         if float(width) / height != float(screen.get_size()[0]) / screen.get_size()[1]:
             raise Exception(
@@ -104,14 +104,22 @@ class World:
 
 d1 = Disk(Point(20, 20), 2, 1, white, Vector(0, 0))
 d2 = Disk(Point(10, 10), 5, 5.97219e+14, white, Vector(0, 0))
-world = World(40, 30, window_surface, [d1, d2])
+#world = World(40, 30, window_surface, [d1, d2])
+from world import World
+from camera import Camera
+from renderer import Renderer
+world = World()
+world.disks = [d1, d2]
+camera = Camera(0, 0, 39, 29)
+renderer = Renderer(world, camera, window_surface)
 
 dt = 0
 
 while True:
     window_surface.fill(blue)
 
-    world.update(dt / 1000.0)
+    #world.update(dt / 1000.0)
+    renderer.update()
 
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -119,6 +127,7 @@ while True:
             pygame.quit()
             sys.exit()
         elif event.type == KEYDOWN:
+            world.update(dt)
             if event.key == K_LEFT:
                 d1.velocity.x -= 0.5
             if event.key == K_RIGHT:
