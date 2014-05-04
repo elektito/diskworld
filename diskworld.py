@@ -102,6 +102,9 @@ class WorldX:
             d.updatePosition(dt)
             self.drawDisk(d)
 
+paused = True
+dragging = False
+dragging_start = None
 d1 = Disk(Point(20, 20), 2, 1, white, Vector(0, 0))
 d2 = Disk(Point(10, 10), 5, 5.97219e+14, white, Vector(0, 0))
 #world = World(40, 30, window_surface, [d1, d2])
@@ -125,8 +128,36 @@ while True:
             print "Going away!"
             pygame.quit()
             sys.exit()
+        elif event.type == MOUSEBUTTONDOWN:
+            if event.button == 1: # left button
+                x, y = event.pos
+                p = renderer.surfaceToWorldCoord(x, y)
+                if abs(p - d1.center) < d1.radius:
+                    # inside the disk
+                    dragging = True
+                    dragging_start = renderer.worldToSurfaceCoord(d1.center)
+        elif event.type == MOUSEMOTION:
+            if dragging:
+                pygame.draw.line(window_surface, red, dragging_start, event.pos)
+                pygame.draw.circle(window_surface, red, event.pos, 5, 0)
+        elif event.type == MOUSEBUTTONUP:
+            if event.button == 3: # right button
+                # Move the smaller disk to the point clicked.
+                p = renderer.surfaceToWorldCoord(event.pos)
+                d1.center = p
+                d1.velocity = Vector(0, 0)
+            elif event.button == 1: # left button
+                dragging = False
+                p1 = renderer.surfaceToWorldCoord(dragging_start)
+                p2 = renderer.surfaceToWorldCoord(event.pos)
+                d1.velocity = 2 * (p2 - p1)
+                paused = False
         elif event.type == KEYDOWN:
-            world.update(dt / 1000.0)
+            if event.key == K_n:
+                world.update(dt / 1000.0)
+            if event.key == K_p:
+                paused = not paused
+                print "Paused." if paused else "Un-paused."
             if event.key == K_LEFT:
                 d1.velocity.x -= 0.5
             if event.key == K_RIGHT:
@@ -141,4 +172,5 @@ while True:
 
     pygame.display.update()
     dt = fps_clock.tick(30)
-    #world.update(dt / 1000.0)
+    if not paused:
+        world.update(dt / 1000.0)
