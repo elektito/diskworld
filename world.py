@@ -1,4 +1,6 @@
 import itertools
+from math import sqrt
+from vector import Vector
 
 class Collision:
     def __init__(self):
@@ -47,8 +49,8 @@ def calculateCollision(disk1, disk2, dt):
     dv = disk2.velocity - disk1.velocity
     dr = disk2.center - disk1.center
 
-    t1 = (R * dv * t - dv * dr * dt) / (dv ** 2)
-    t2 = (-R * dv * t - dv * dr * dt) / (dv ** 2)
+    t1 = (dt * R**2 * sqrt(dv * dv) - dt * (dr * dv)) / (dv * dv)
+    t2 = (-dt * R**2 * sqrt(dv * dv) + dt * (dr * dv)) / (dv * dv)
 
     t1 = t1 if 0 < t1 <= dt else None
     t2 = t2 if 0 < t2 <= dt else None
@@ -84,6 +86,7 @@ class World:
         # Calculate non-contact forces
         for d1, d2 in itertools.combinations(self.disks, 2):
             # gravity
+            G = 6.674e-11
             fg = (G * d1.mass * d2.mass) / (d2.center - d1.center).magnitude ** 2
             d1.force = Vector(angle=(d2.center - d1.center).angle, magnitude=fg)
             d2.force = Vector(angle=(d1.center - d2.center).angle, magnitude=fg)
@@ -102,7 +105,7 @@ class World:
 
         # Calculate velocities
         for d in self.disks:
-            d.velocity += d.acceleration * dt * d.velocity
+            d.velocity += d.acceleration * dt
 
         # Calculate collisions
         for d1, d2 in itertools.combinations(self.disks, 2):
