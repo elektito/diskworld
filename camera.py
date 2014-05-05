@@ -62,3 +62,17 @@ camera.zoom(-0.1) zooms the camera out for 10%.
         self.x2 += (nw - w) / 2
         self.y1 -= (nh - h) / 2
         self.y2 += (nh - h) / 2
+
+    def pan(self, v):
+        '''Pans the camera with the amount specified by the vector v. As an
+example, camera.pan(Vector(3, -8) pans the camera three meters to the
+right and eight meter downwards.
+
+        '''
+
+        bl = Point(self.x1, self.y1)
+        tr = Point(self.x2, self.y2)
+        bl += v
+        tr += v
+        self.x1, self.y1 = bl.x, bl.y
+        self.x2, self.y2 = tr.x, tr.y

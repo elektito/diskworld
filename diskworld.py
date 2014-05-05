@@ -105,6 +105,8 @@ class WorldX:
 paused = True
 dragging = False
 dragging_start = None
+panning = False
+panning_start = None
 d1 = Disk(Point(20, 20), 2, 1, white, Vector(0, 0))
 d2 = Disk(Point(10, 10), 5, 5.97219e+14, white, Vector(0, 0))
 #world = World(40, 30, window_surface, [d1, d2])
@@ -136,6 +138,10 @@ while True:
                     # inside the disk
                     dragging = True
                     dragging_start = renderer.worldToSurfaceCoord(d1.center)
+                elif abs(p - d2.center) > d2.radius:
+                    # outside both disks. start panning
+                    panning = True
+                    panning_start = event.pos
             elif event.button == 4: # scroll up
                 camera.zoom(0.1)
             elif event.button == 5: # scroll down
@@ -147,6 +153,13 @@ while True:
                     renderer.guides[0].disk = d1
                 renderer.guides[0].start = d1.center
                 renderer.guides[0].end = renderer.surfaceToWorldCoord(event.pos)
+            elif panning:
+                new_pos = event.pos
+                p1 = renderer.surfaceToWorldCoord(panning_start)
+                p2 = renderer.surfaceToWorldCoord(new_pos)
+                v = p1 - p2
+                panning_start = new_pos
+                camera.pan(v)
         elif event.type == MOUSEBUTTONUP:
             if event.button == 3: # right button
                 # Move the smaller disk to the point clicked.
@@ -161,6 +174,7 @@ while True:
                     renderer.guides = []
                     paused = False
                 dragging = False
+                panning = False
         elif event.type == KEYDOWN:
             if event.key == K_n:
                 world.update(dt / 1000.0)
