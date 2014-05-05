@@ -170,7 +170,7 @@ while True:
                 if dragging:
                     p1 = renderer.surfaceToWorldCoord(dragging_start)
                     p2 = renderer.surfaceToWorldCoord(event.pos)
-                    d1.velocity = 2 * (p2 - p1)
+                    d1.velocity = p2 - p1
                     renderer.guides = []
                     paused = False
                 dragging = False
@@ -181,17 +181,11 @@ while True:
             if event.key == K_p:
                 paused = not paused
                 print "Paused." if paused else "Un-paused."
-            if event.key == K_LEFT:
-                d1.velocity.x -= 0.5
-            if event.key == K_RIGHT:
-                d1.velocity.x += 0.5
-            if event.key == K_UP:
-                d1.velocity.y += 0.5
-            if event.key == K_DOWN:
-                d1.velocity.y -= 0.5
-            print "New speed:", d1.velocity
             if event.key == K_q:
                 pygame.event.post(pygame.event.Event(QUIT))
+            if event.key == K_ESCAPE:
+                dragging = False
+                renderer.guides = []
 
     pygame.display.update()
     dt = fps_clock.tick(30)
