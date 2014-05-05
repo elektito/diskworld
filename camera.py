@@ -46,3 +46,19 @@ bottom-left and (x2, y2) as its top-right.'''
         cornerDistanceSq = (distanceX - self.width / 2) ** 2 + \
                            (distanceY - self.height / 2) ** 2
         return cornerDistanceSq <= disk.radius ** 2
+
+    def zoom(self, z):
+        '''Zooms the camera in or out by the specified amount. A positive
+value for z means zoom in, a negative value zoom out. For example
+calling camera.zoom(0.2) zooms the camera in for 20%, while
+camera.zoom(-0.1) zooms the camera out for 10%.
+
+        '''
+
+        nw = self.width * (1 - z)
+        w, h = self.width, self.height
+        nh = nw * (h / w)
+        self.x1 -= (nw - w) / 2
+        self.x2 += (nw - w) / 2
+        self.y1 -= (nh - h) / 2
+        self.y2 += (nh - h) / 2

@@ -136,6 +136,10 @@ while True:
                     # inside the disk
                     dragging = True
                     dragging_start = renderer.worldToSurfaceCoord(d1.center)
+            elif event.button == 4: # scroll up
+                camera.zoom(0.1)
+            elif event.button == 5: # scroll down
+                camera.zoom(-0.1)
         elif event.type == MOUSEMOTION:
             if dragging:
                 if len(renderer.guides) == 0:
