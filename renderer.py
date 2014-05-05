@@ -30,9 +30,12 @@ class Renderer:
         r = int(disk.radius * ratio)
 
         if not ghost:
-            pygame.draw.circle(self.surface, disk.color, (x, y), r, 0)
+            pygame.gfxdraw.filled_circle(self.surface, x, y, r, disk.color)
+            pygame.gfxdraw.aacircle(self.surface, x, y, r, disk.color)
         else:
-            pygame.draw.circle(self.surface, pygame.Color(0, 0, 0), (x, y), r, 1)
+            #pygame.gfxdraw.filled_circle(self.surface, x, y, r, disk.color)
+            pygame.gfxdraw.aacircle(self.surface, x, y, r-1, disk.color)
+            pygame.gfxdraw.aacircle(self.surface, x, y, r, disk.color)
 
     def surfaceToWorldCoord(self, x, y=None):
         '''Converts the given coordinate in the graphics surface to a point in
