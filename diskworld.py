@@ -110,7 +110,7 @@ d2 = Disk(Point(10, 10), 5, 5.97219e+14, white, Vector(0, 0))
 #world = World(40, 30, window_surface, [d1, d2])
 from world import World
 from camera import Camera
-from renderer import Renderer
+from renderer import Renderer, Guide
 world = World()
 world.disks = [d1, d2]
 camera = Camera(0, 0, 39, 29)
@@ -138,8 +138,11 @@ while True:
                     dragging_start = renderer.worldToSurfaceCoord(d1.center)
         elif event.type == MOUSEMOTION:
             if dragging:
-                pygame.draw.line(window_surface, red, dragging_start, event.pos)
-                pygame.draw.circle(window_surface, red, event.pos, 5, 0)
+                if len(renderer.guides) == 0:
+                    renderer.guides.append(Guide())
+                    renderer.guides[0].disk = d1
+                renderer.guides[0].start = d1.center
+                renderer.guides[0].end = renderer.surfaceToWorldCoord(event.pos)
         elif event.type == MOUSEBUTTONUP:
             if event.button == 3: # right button
                 # Move the smaller disk to the point clicked.
@@ -147,11 +150,13 @@ while True:
                 d1.center = p
                 d1.velocity = Vector(0, 0)
             elif event.button == 1: # left button
+                if dragging:
+                    p1 = renderer.surfaceToWorldCoord(dragging_start)
+                    p2 = renderer.surfaceToWorldCoord(event.pos)
+                    d1.velocity = 2 * (p2 - p1)
+                    renderer.guides = []
+                    paused = False
                 dragging = False
-                p1 = renderer.surfaceToWorldCoord(dragging_start)
-                p2 = renderer.surfaceToWorldCoord(event.pos)
-                d1.velocity = 2 * (p2 - p1)
-                paused = False
         elif event.type == KEYDOWN:
             if event.key == K_n:
                 world.update(dt / 1000.0)
