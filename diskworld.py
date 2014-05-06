@@ -1,13 +1,12 @@
 import pygame
 import sys
-import itertools
-from math import sqrt
-from collections import defaultdict
 from pygame.locals import *
-import pygame.gfxdraw
 from disk import Disk
 from vector import Vector
 from point import Point
+from world import World
+from camera import Camera
+from renderer import Renderer, Guide
 
 pygame.init()
 fps_clock = pygame.time.Clock()
@@ -20,88 +19,6 @@ red = pygame.Color(255, 0, 0)
 green = pygame.Color(0, 255, 0)
 blue = pygame.Color(0, 0, 255)
 
-class WorldX:
-    def __init__(self, width, height, screen, disks):
-        if float(width) / height != float(screen.get_size()[0]) / screen.get_size()[1]:
-            raise Exception(
-                "width/height ratio for the game world should be the"
-                " same as screen width/height ratio.")
-
-        self.width = float(width)
-        self.height = float(height)
-        self.screen = screen
-        self.disks = disks
-
-    def drawDisk(self, disk):
-        # convert to pygame coordinates
-        scrw, scrh = self.screen.get_size()
-        nx = int(float(disk.center.x) /  self.width * scrw)
-        ny = int(scrh - float(disk.center.y) / self.height * scrh)
-        nr = int(float(disk.radius) * (scrw / self.width))
-
-        pygame.draw.circle(self.screen, disk.color, (nx, ny), nr, 0)
-
-    def update(self, dt):
-        G = 6.674e-11
-        forces = defaultdict(list)
-
-        # Calculate non-contact forces.
-        for d1, d2 in itertools.combinations(self.disks, 2):
-            # gravity
-            fg = (G * d1.mass * d2.mass) / (d2.center - d1.center).magnitude ** 2
-            forces[d1].append(Vector(angle=(d2.center - d1.center).angle, magnitude=fg))
-            forces[d2].append(Vector(angle=(d1.center - d2.center).angle, magnitude=fg))
-
-        # Calculate contact forces.
-        for d1, d2 in itertools.combinations(self.disks, 2):
-            # normal force
-            if d1.isInContact(d2):
-                fy = sum(forces[d1], Vector(0, 0)).project(d2.center - d1.center)
-                forces[d1].append(-fy)
-                forces[d2].append(fy)
-
-                # Calculate collision impulse from conservation of
-                # momentum and conservation of energy. Look at this
-                # for details:
-                # http://www.imada.sdu.dk/~rolf/Edu/DM815/E10/2dcollisions.pdf
-                m1 = d1.mass
-                m2 = d2.mass
-                v1 = d1.velocity
-                v2 = d2.velocity
-                n = d2.center - d1.center # normal vector
-                un = n / n.magnitude # unit normal vector
-                ut = Vector(-un.y, un.x) # unit tangent vector (perpendicular to normal)
-                v1n = un * v1 # normal component of disk 1 velocity
-                v1t = ut * v1 # tangential component of disk 1 velocity
-                v2n = un * v2 # normal component of disk 2 velocity
-                v2t = ut * v2 # tangential component of disk 2 velocity
-                nv1t = ut * v1t # new tangential component of disk 1 velocity
-                nv2t = ut * v2t # new tangential component of disk 2 velocity
-
-                # magnitude of the new normal component of disk 1 velocity
-                nv1n_mag = (v1n * (m1 - m2) + v2n * 2 * m2) / (m1 + m2)
-
-                # magnitude of the new normal component of disk 2 velocity
-                nv2n_mag = (v2n * (m2 - m1) + v1n * 2 * m1) / (m1 + m2)
-
-                # new normal component of velocities
-                nv1n = un * nv1n_mag
-                nv2n = un * nv2n_mag
-
-                # new velocities
-                nv1 = nv1n + nv1t
-                nv2 = nv2n + nv2t
-
-                d1.velocity = nv1
-                d2.velocity = nv2
-
-        for d in self.disks:
-            f = sum(forces[d], Vector(0, 0))
-            a = f / float(d.mass)
-            d.velocity += a * dt
-            d.updatePosition(dt)
-            self.drawDisk(d)
-
 paused = True
 dragging = False
 dragging_start = None
@@ -109,10 +26,7 @@ panning = False
 panning_start = None
 d1 = Disk(Point(20, 20), 2, 1, white, Vector(0, 0))
 d2 = Disk(Point(10, 10), 5, 5.97219e+14, white, Vector(0, 0))
-#world = World(40, 30, window_surface, [d1, d2])
-from world import World
-from camera import Camera
-from renderer import Renderer, Guide
+
 world = World()
 world.disks = [d1, d2]
 camera = Camera(0, 0, 39, 29)

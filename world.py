@@ -1,4 +1,5 @@
 import itertools
+import pygame.gfxdraw
 from math import sqrt
 from vector import Vector
 
