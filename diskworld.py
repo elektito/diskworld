@@ -22,6 +22,7 @@ blue = pygame.Color(0, 0, 255)
 paused = True
 dragging = False
 dragging_start = None
+dragging_disk = None
 panning = False
 panning_start = None
 d1 = Disk(Point(20, 20), 2, 1, white, Vector(0, 0))
@@ -48,11 +49,14 @@ while True:
             if event.button == 1: # left button
                 x, y = event.pos
                 p = renderer.surfaceToWorldCoord(x, y)
-                if abs(p - d1.center) < d1.radius:
-                    # inside the disk
-                    dragging = True
-                    dragging_start = renderer.worldToSurfaceCoord(d1.center)
-                elif abs(p - d2.center) > d2.radius:
+                for d in world.disks:
+                    if abs(p - d.center) < d.radius:
+                        # inside a disk
+                        dragging = True
+                        dragging_start = renderer.worldToSurfaceCoord(d.center)
+                        dragging_disk = d
+                        break
+                else:
                     # outside both disks. start panning
                     panning = True
                     panning_start = event.pos
@@ -64,8 +68,8 @@ while True:
             if dragging:
                 if len(renderer.guides) == 0:
                     renderer.guides.append(Guide())
-                    renderer.guides[0].disk = d1
-                renderer.guides[0].start = d1.center
+                    renderer.guides[0].disk = dragging_disk
+                renderer.guides[0].start = dragging_disk.center
                 renderer.guides[0].end = renderer.surfaceToWorldCoord(event.pos)
             elif panning:
                 new_pos = event.pos
@@ -84,7 +88,8 @@ while True:
                 if dragging:
                     p1 = renderer.surfaceToWorldCoord(dragging_start)
                     p2 = renderer.surfaceToWorldCoord(event.pos)
-                    d1.velocity = p2 - p1
+                    dragging_disk.velocity = p2 - p1
+                    dragging_disk = None
                     renderer.guides = []
                     paused = False
                 dragging = False
