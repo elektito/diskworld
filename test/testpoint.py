@@ -40,4 +40,11 @@ class TestPoint(unittest.TestCase):
     def test_addition_with_vector(self):
         p = Point(4, 10)
         v = Vector(1, -2)
+        self.assertTrue(isinstance(p + v, Point))
         self.assertEqual(p + v, Point(5, 8))
+
+    def test_subtracting_a_vector(self):
+        p = Point(5.5, 6)
+        v = Vector(2, 3.4)
+        self.assertTrue(isinstance(p - v, Point))
+        self.assertEqual(p - v, Point(3.5, 2.6))
