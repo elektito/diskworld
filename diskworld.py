@@ -190,4 +190,5 @@ while True:
     pygame.display.update()
     dt = fps_clock.tick(30)
     if not paused:
-        world.update(dt / 1000.0)
+        # fixed time-step for physics
+        world.update(33 / 1000.0)
