@@ -8,6 +8,14 @@ from world import World
 from camera import Camera
 from renderer import Renderer, Guide
 
+def get_disk_from_surface_point(point, world, renderer):
+    ret = None
+    for d in world.disks:
+        p = renderer.surfaceToWorldCoord(point)
+        if abs(p - d.center) < d.radius:
+            ret = d
+    return ret
+
 pygame.init()
 fps_clock = pygame.time.Clock()
 
@@ -47,19 +55,17 @@ while True:
             sys.exit()
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1: # left button
-                x, y = event.pos
-                p = renderer.surfaceToWorldCoord(x, y)
-                for d in world.disks:
-                    if abs(p - d.center) < d.radius:
-                        # inside a disk
-                        dragging = True
-                        dragging_start = renderer.worldToSurfaceCoord(d.center)
-                        dragging_disk = d
-                        break
+                dragging_disk = get_disk_from_surface_point(event.pos, world, renderer)
+                if dragging_disk is not None:
+                    # inside a disk
+                    dragging = True
+                    dragging_start = renderer.worldToSurfaceCoord(dragging_disk.center)
                 else:
                     # outside both disks. start panning
                     panning = True
                     panning_start = event.pos
+            elif event.button == 3: # right button
+                pass
             elif event.button == 4: # scroll up
                 camera.zoom(0.1)
             elif event.button == 5: # scroll down
