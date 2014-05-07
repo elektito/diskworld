@@ -85,11 +85,10 @@ while True:
                 camera.zoom(-0.1)
         elif event.type == MOUSEMOTION:
             if throwing:
-                if len(renderer.guides) == 0:
-                    renderer.guides.append(Guide())
-                    renderer.guides[0].disk = throwing_disk
-                renderer.guides[0].start = throwing_disk.center
-                renderer.guides[0].end = renderer.surfaceToWorldCoord(event.pos)
+                if throwing_disk.visuals.guide == None:
+                    throwing_disk.visuals.guide = Guide()
+                throwing_disk.visuals.guide.start = throwing_disk.center
+                throwing_disk.visuals.guide.end = renderer.surfaceToWorldCoord(event.pos)
             elif dragging_disk is not None:
                 p = renderer.surfaceToWorldCoord(event.pos)
                 dragging_disk.center = p - dragging_offset
@@ -109,8 +108,8 @@ while True:
                     p1 = renderer.surfaceToWorldCoord(throwing_start)
                     p2 = renderer.surfaceToWorldCoord(event.pos)
                     throwing_disk.velocity = p2 - p1
+                    throwing_disk.visuals.guide = None
                     throwing_disk = None
-                    renderer.guides = []
                     paused = False
                 throwing = False
         elif event.type == KEYDOWN:
@@ -123,7 +122,8 @@ while True:
                 pygame.event.post(pygame.event.Event(QUIT))
             if event.key == K_ESCAPE:
                 throwing = False
-                renderer.guides = []
+                throwing_disk.visuals.guide = None
+                throwing_disk = None
 
     pygame.display.update()
     dt = fps_clock.tick(30)

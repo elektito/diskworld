@@ -65,37 +65,40 @@ coordinates and returns the results as a 2-tuple.'''
     def drawGuides(self):
         red = pygame.Color(255, 0, 0)
         black = pygame.Color(0, 0, 0)
-        for g in self.guides:
-            start = self.worldToSurfaceCoord(g.start)
-            end = self.worldToSurfaceCoord(g.end)
-            pygame.draw.line(self.surface, red, start, end)
-            pygame.draw.circle(self.surface, red, end, 5, 0)
 
-            g.disk.velocity = g.end - g.start
+        for d in self.world.disks:
+            if d.visuals.guide is not None:
+                g = d.visuals.guide
+                start = self.worldToSurfaceCoord(g.start)
+                end = self.worldToSurfaceCoord(g.end)
+                pygame.draw.line(self.surface, red, start, end)
+                pygame.draw.circle(self.surface, red, end, 5, 0)
 
-            collisions = []
-            for d in self.world.disks:
-                if d != g.disk:
-                    c1, c2 = calculateCollision(g.disk, d, 1.0)
-                    if c1 is not None:
-                        collisions.append(c1)
+                d.velocity = g.end - g.start
 
-            if len(collisions) > 1:
-                collisions.sort(key=lambda c: c.toi)
+                collisions = []
+                for d2 in self.world.disks:
+                    if d2 != d:
+                        c1, c2 = calculateCollision(d, d2, 1.0)
+                        if c1 is not None:
+                            collisions.append(c1)
 
-                # Bypass the collisions with the same time of impact
-                # (toi).
-                first = collisions[0]
-                i = 1
-                while collisions[i] - first < 0.000001:
-                    i += 1
-                collisions = collisions[:i]
+                if len(collisions) > 1:
+                    collisions.sort(key=lambda c: c.toi)
 
-            if len(collisions) > 0:
-                dr = g.disk.velocity * collisions[0].toi
-            else:
-                dr = g.disk.velocity * 1.0
-            self.drawGhost(g.disk.center + dr, g.disk.radius, black)
+                    # Bypass the collisions with the same time of
+                    # impact (toi).
+                    first = collisions[0]
+                    i = 1
+                    while collisions[i] - first < 0.000001:
+                        i += 1
+                    collisions = collisions[:i]
+
+                if len(collisions) > 0:
+                    dr = d.velocity * collisions[0].toi
+                else:
+                    dr = d.velocity * 1.0
+                self.drawGhost(d.center + dr, d.radius, black)
 
     def update(self):
         for d in self.world.disks:
