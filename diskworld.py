@@ -35,8 +35,10 @@ dragging_disk = None
 dragging_offset = None
 panning = False
 panning_start = None
-d1 = Disk(Point(20, 20), 2, 1, white, Vector(0, 0))
-d2 = Disk(Point(10, 10), 5, 5.97219e+14, white, Vector(0, 0))
+d1 = Disk(Point(20, 20), 2, 1, Vector(0, 0))
+d1.visuals.color = white
+d2 = Disk(Point(10, 10), 5, 5.97219e+14, Vector(0, 0))
+d2.visuals.color = white
 
 world = World()
 world.disks = [d1, d2]

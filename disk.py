@@ -2,8 +2,14 @@ from math import sqrt, pi
 from vector import Vector
 from point import Point
 
+class Visual:
+    def __init__(self):
+        self.color = None
+        self.trail = None
+        self.guide = None
+
 class Disk:
-    def __init__(self, center, radius, mass, color, velocity=Vector(0, 0)):
+    def __init__(self, center, radius, mass, velocity=Vector(0, 0)):
         if not isinstance(center, Point):
             raise TypeError('Disk center must be a point.')
 
@@ -14,11 +20,12 @@ class Disk:
         self.radius = radius
         self.velocity = velocity
         self.mass = mass
-        self.color = color
 
         self.force = Vector(0, 0)
         self.acceleration = Vector(0, 0)
         self.collisions = []
+
+        self.visuals = Visual()
 
     @property
     def surface(self):

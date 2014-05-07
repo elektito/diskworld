@@ -17,25 +17,26 @@ class Renderer:
 
         self.guides = []
 
-    def drawDisk(self, disk, ghost=False):
+    def calcDiskSurfaceMetrics(self, center, radius):
         scrw, scrh = self.surface.get_size()
-        ratiow = float(scrw) / self.camera.width
-        ratioh = float(scrh) / self.camera.height
-        assert(ratiow - ratioh < .0001)
-        ratio = ratiow
+        ratio = float(scrw) / self.camera.width
 
-        x = int((disk.center.x - self.camera.x1) * ratio)
-        y = int((disk.center.y - self.camera.y1) * ratio)
-        y = int(scrh - y) # The y axis in pygame is top-down.
-        r = int(disk.radius * ratio)
+        x, y = self.worldToSurfaceCoord(center)
+        r = int(radius * ratio)
 
-        if not ghost:
-            pygame.gfxdraw.filled_circle(self.surface, x, y, r, disk.color)
-            pygame.gfxdraw.aacircle(self.surface, x, y, r, disk.color)
-        else:
-            #pygame.gfxdraw.filled_circle(self.surface, x, y, r, disk.color)
-            pygame.gfxdraw.aacircle(self.surface, x, y, r-1, disk.color)
-            pygame.gfxdraw.aacircle(self.surface, x, y, r, disk.color)
+        return x, y, r
+
+    def drawDisk(self, center, radius, color):
+        x, y, r = self.calcDiskSurfaceMetrics(center, radius)
+
+        pygame.gfxdraw.filled_circle(self.surface, x, y, r, color)
+        pygame.gfxdraw.aacircle(self.surface, x, y, r, color)
+
+    def drawGhost(self, center, radius, color):
+        x, y, r = self.calcDiskSurfaceMetrics(center, radius)
+
+        pygame.gfxdraw.aacircle(self.surface, x, y, r-1, color)
+        pygame.gfxdraw.aacircle(self.surface, x, y, r, color)
 
     def surfaceToWorldCoord(self, x, y=None):
         '''Converts the given coordinate in the graphics surface to a point in
@@ -92,16 +93,13 @@ coordinates and returns the results as a 2-tuple.'''
 
             if len(collisions) > 0:
                 dr = g.disk.velocity * collisions[0].toi
-                d = Disk(g.disk.center + dr, g.disk.radius, g.disk.mass, black, Vector(0, 0))
-                self.drawDisk(d, ghost=True)
             else:
                 dr = g.disk.velocity * 1.0
-                d = Disk(g.disk.center + dr, g.disk.radius, g.disk.mass, black, Vector(0, 0))
-                self.drawDisk(d, ghost=True)
+            self.drawGhost(g.disk.center + dr, g.disk.radius, black)
 
     def update(self):
         for d in self.world.disks:
             if self.camera.isInView(d):
-                self.drawDisk(d)
+                self.drawDisk(d.center, d.radius, d.visuals.color)
 
         self.drawGuides()
