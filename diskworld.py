@@ -6,7 +6,7 @@ from vector import Vector
 from point import Point
 from world import World
 from camera import Camera
-from renderer import Renderer, Guide
+from renderer import Renderer, Guide, Trail
 
 def get_disk_from_surface_point(point, world, renderer):
     ret = None
@@ -37,6 +37,7 @@ panning = False
 panning_start = None
 d1 = Disk(Point(20, 20), 2, 1, Vector(0, 0))
 d1.visuals.color = white
+d1.visuals.trail = Trail(1, 10)
 d2 = Disk(Point(10, 10), 5, 5.97219e+14, Vector(0, 0))
 d2.visuals.color = white
 
@@ -50,7 +51,7 @@ dt = 0
 while True:
     window_surface.fill(blue)
 
-    renderer.update()
+    renderer.update(dt / 1000.0)
 
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -68,6 +69,8 @@ while True:
                 d = get_disk_from_surface_point(event.pos, world, renderer)
                 if d is None:
                     d1.center = renderer.surfaceToWorldCoord(event.pos)
+                    if d1.visuals is not None and d1.visuals.trail is not None:
+                        d1.visuals.trail.clear()
                     d1.velocity = Vector(0, 0)
             elif event.button == 1: # left button
                 dragging_disk = get_disk_from_surface_point(event.pos, world, renderer)
