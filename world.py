@@ -111,8 +111,8 @@ class World:
             # gravity
             G = 6.674e-11
             fg = (G * d1.mass * d2.mass) / (d2.center - d1.center).magnitude ** 2
-            d1.force = Vector(angle=(d2.center - d1.center).angle, magnitude=fg)
-            d2.force = Vector(angle=(d1.center - d2.center).angle, magnitude=fg)
+            d1.force += Vector(angle=(d2.center - d1.center).angle, magnitude=fg)
+            d2.force += Vector(angle=(d1.center - d2.center).angle, magnitude=fg)
         print "force after:", [d.force for d in self.disks]
 
         print "force before:", [d.force for d in self.disks]
