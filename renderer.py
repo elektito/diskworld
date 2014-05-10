@@ -84,7 +84,9 @@ coordinates and returns the results as a 2-tuple.'''
                 pygame.draw.aaline(self.surface, red, start, end, True)
                 self.drawFilledCircle(end[0], end[1], 5, red)
 
-                d.velocity = g.end - g.start
+                v = g.end - g.start
+                original_v = d.velocity
+                d.velocity = v
 
                 collisions = []
                 for d2 in self.world.disks:
@@ -104,11 +106,10 @@ coordinates and returns the results as a 2-tuple.'''
                         i += 1
                     collisions = collisions[:i]
 
-                if len(collisions) > 0:
-                    dr = d.velocity * collisions[0].toi
-                else:
-                    dr = d.velocity * 1.0
+                dr = v * collisions[0].toi if len(collisions) > 0 else v
                 self.drawGhost(d.center + dr, d.radius, black)
+
+                d.velocity = original_v
 
     def drawTrails(self):
         for d in self.world.disks:

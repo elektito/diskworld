@@ -112,9 +112,9 @@ while True:
                     p2 = renderer.surfaceToWorldCoord(event.pos)
                     throwing_disk.velocity = p2 - p1
                     throwing_disk.visuals.guide = None
-                    throwing_disk = None
                     paused = False
                 throwing = False
+                throwing_disk = None
         elif event.type == KEYDOWN:
             if event.key == K_n:
                 world.update(dt / 1000.0)
