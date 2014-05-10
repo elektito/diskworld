@@ -102,7 +102,7 @@ coordinates and returns the results as a 2-tuple.'''
                     # impact (toi).
                     first = collisions[0]
                     i = 1
-                    while collisions[i] - first < 0.000001:
+                    while collisions[i].toi - first.toi < 0.000001:
                         i += 1
                     collisions = collisions[:i]
 
