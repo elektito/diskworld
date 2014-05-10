@@ -125,7 +125,9 @@ while True:
                 pygame.event.post(pygame.event.Event(QUIT))
             if event.key == K_ESCAPE:
                 throwing = False
-                throwing_disk.visuals.guide = None
+                if throwing_disk is not None \
+                   and throwing_disk.visuals is not None:
+                    throwing_disk.visuals.guide = None
                 throwing_disk = None
 
     pygame.display.update()
