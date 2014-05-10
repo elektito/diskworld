@@ -91,7 +91,10 @@ coordinates and returns the results as a 2-tuple.'''
                 collisions = []
                 for d2 in self.world.disks:
                     if d2 != d:
+                        v_before = d2.velocity
+                        d2.velocity = Vector(0, 0)
                         c1, c2 = calculateCollision(d, d2, 1.0)
+                        d2.velocity = v_before
                         if c1 is not None:
                             collisions.append(c1)
 
