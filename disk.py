@@ -54,4 +54,4 @@ class Disk:
         self.center.y += self.velocity.y * dt
 
     def __repr__(self):
-        return "<Disk mass={} radius={} color={}>".format(self.mass, self.radius, self.color)
+        return "<Disk mass={} radius={} center={} velocity={}>".format(self.mass, self.radius, self.center, self.velocity)
