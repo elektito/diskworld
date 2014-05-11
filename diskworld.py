@@ -46,6 +46,7 @@ world.disks = [d1, d2]
 camera = Camera(bottomleft=Point(0, 0), topright=Point(39, 29))
 renderer = Renderer(world, camera, window_surface)
 
+timestep = 33
 dt = 0
 
 while True:
@@ -117,7 +118,7 @@ while True:
                 throwing_disk = None
         elif event.type == KEYDOWN:
             if event.key == K_n:
-                world.update(dt / 1000.0)
+                world.update(timestep / 1000.0)
             if event.key == K_p:
                 paused = not paused
                 print "Paused." if paused else "Un-paused."
@@ -131,7 +132,7 @@ while True:
                 throwing_disk = None
 
     pygame.display.update()
-    dt = fps_clock.tick(30)
+    dt = fps_clock.tick(timestep)
     if not paused:
         # fixed time-step for physics
-        world.update(33 / 1000.0)
+        world.update(timestep / 1000.0)
