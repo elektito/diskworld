@@ -43,7 +43,7 @@ d2.visuals.color = white
 
 world = World()
 world.disks = [d1, d2]
-camera = Camera(0, 0, 39, 29)
+camera = Camera(bottomleft=Point(0, 0), topright=Point(39, 29))
 renderer = Renderer(world, camera, window_surface)
 
 dt = 0

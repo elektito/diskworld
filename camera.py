@@ -1,31 +1,70 @@
 from point import Point
+from vector import Vector
 
-class Camera:
-    def __init__(self, x1, y1, x2, y2):
-        '''Defines a canera that views a rectangle with (x1, y1) as its
-bottom-left and (x2, y2) as its top-right.'''
+class Camera(object):
+    def __init__(self, bottomleft=None, topright=None, width=None, height=None):
+        if bottomleft is not None and topright is not None:
+            if not isinstance(bottomleft, Point) or not isinstance(topright, Point):
+                raise ValueError("bottomleft and topright arguments must be Point instances.")
 
-        if x1 >= x2 or y1 >= y2:
-            raise ValueError('x1({}) needs to be smaller than x2({}) and y1({}) needs to be smaller than y2({}).'.format(
-                x1, x2, y1, y2))
+            if bottomleft.x >= topright.x or bottomleft.y >= topright.y:
+                raise ValueError("Invalid coordinates for camera bottom-left/top-right.")
 
-        self.x1 = float(x1)
-        self.y1 = float(y1)
-        self.x2 = float(x2)
-        self.y2 = float(y2)
+            self.__bottomleft = bottomleft
+            self.__topright = topright
+
+        elif bottomleft is not None and width is not None and height is not None:
+            if not isinstance(bottomleft, Point):
+                raise ValueError("bottomleft argument must be Point instances.")
+
+            if width <= 0 or height <= 0:
+                raise ValueError("Camera width and height cannot be negative.")
+
+            self.__bottomleft = bottomleft
+            self.__topright = Point(bottomleft.x + width, bottomleft.y + height)
+
+        else:
+            raise ValueError()
+
+    @property
+    def bottomleft(self):
+        return self.__bottomleft
+
+    @bottomleft.setter
+    def bottomleft(self, value):
+        raise AttributeError("Cannot set camera properties directly. Use pan and/or zoom instead.")
+
+    @property
+    def topright(self):
+        return self.__topright
+
+    @topright.setter
+    def topright(self, value):
+        raise AttributeError("Cannot set camera properties directly. Use pan and/or zoom instead.")
 
     @property
     def width(self):
-        return self.x2 - self.x1
+        return float(self.topright.x - self.bottomleft.x)
+
+    @width.setter
+    def width(self, value):
+        raise AttributeError("Cannot set camera properties directly. Use pan and/or zoom instead.")
 
     @property
     def height(self):
-        return self.y2 - self.y1
+        return float(self.topright.y - self.bottomleft.y)
+
+    @height.setter
+    def height(self, value):
+        raise AttributeError("Cannot set camera properties directly. Use pan and/or zoom instead.")
 
     @property
     def center(self):
-        return Point(self.x1 + self.width / 2.0,
-                     self.y1 + self.height / 2.0)
+        return self.bottomleft + Vector(self.width / 2.0, self.height / 2.0)
+
+    @center.setter
+    def center(self, value):
+        raise AttributeError("Cannot set camera properties directly. Use pan and/or zoom instead.")
 
     def isInView(self, disk):
         distanceX = abs(disk.center.x - self.center.x)
@@ -55,13 +94,14 @@ camera.zoom(-0.1) zooms the camera out for 10%.
 
         '''
 
-        nw = self.width * (1 - z)
         w, h = self.width, self.height
+        nw = w * (1 - z)
         nh = nw * (h / w)
-        self.x1 -= (nw - w) / 2
-        self.x2 += (nw - w) / 2
-        self.y1 -= (nh - h) / 2
-        self.y2 += (nh - h) / 2
+
+        self.__bottomleft = Point(self.bottomleft.x - (nw - w) / 2,
+                                  self.bottomleft.y - (nh - h) / 2)
+        self.__topright = Point(self.topright.x + (nw - w) / 2,
+                                self.topright.y + (nh - h) / 2)
 
     def pan(self, v):
         '''Pans the camera with the amount specified by the vector v. As an
@@ -70,9 +110,5 @@ right and eight meter downwards.
 
         '''
 
-        bl = Point(self.x1, self.y1)
-        tr = Point(self.x2, self.y2)
-        bl += v
-        tr += v
-        self.x1, self.y1 = bl.x, bl.y
-        self.x2, self.y2 = tr.x, tr.y
+        self.__bottomleft += v
+        self.__topright += v
