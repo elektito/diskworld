@@ -2,6 +2,7 @@ import itertools
 import pygame.gfxdraw
 from math import sqrt
 from vector import Vector
+from helpers import float_eq
 
 class Collision:
     def __init__(self, disk, otherDisk):
@@ -56,28 +57,31 @@ def calculateCollision(disk1, disk2, dt):
     # The ralative velocity of the two disks.
     vr = disk2.velocity - disk1.velocity
 
-    # The component of the relative velocity along centers_vector.
-    comp = vr * centers_vector / centers_vector.magnitude
-
-    #if comp <= 0:
-    #if (disk2.center.x - disk1.center.x) * (disk1.velocity.x - disk2.velocity.x) + \
-    #   (disk2.center.y - disk1.center.y) * (disk1.velocity.y - disk2.velocity.y) <= 0:
+    # If the relative velocity has a component along the normal vector
+    # of the two disks (centers_vector), it means the two disks are
+    # not moving towards each other.
     if vr * centers_vector >= 0:
-        print "XXXXX", comp, disk1.center, disk1.velocity, disk2.center, disk2.velocity
+        print "XXXXX", disk1.center, disk1.velocity, disk2.center, disk2.velocity
         return None, None
 
-    R = disk1.radius + disk2.radius
-    dv = disk2.velocity - disk1.velocity
-    dr = disk2.center - disk1.center
+    if disk1.isInContact(disk2):
+        t1 = t2 = 0.0
+    else:
+        R = disk1.radius + disk2.radius
+        dv = disk2.velocity - disk1.velocity
+        dr = disk2.center - disk1.center
 
-    delta = R**2 * (dv * dv) - dr.x**2 * dv.y **2 + 2 * dr.x * dr.y * dv.x * dv.y - dr.y**2 * dv.x**2
-    if delta < 0:
-        return None, None
-    t1 = -((dr * dv) + sqrt(delta)) / (dv * dv)
-    t2 = -((dr * dv) + sqrt(delta)) / (dv * dv)
+        delta = R**2 * (dv * dv) - \
+                dr.x**2 * dv.y **2 + \
+                2 * dr.x * dr.y * dv.x * dv.y - \
+                dr.y**2 * dv.x**2
+        if delta < 0:
+            return None, None
+        t1 = -((dr * dv) + sqrt(delta)) / (dv * dv)
+        t2 = -((dr * dv) + sqrt(delta)) / (dv * dv)
 
-    t1 = t1 if 0 < t1 <= dt else None
-    t2 = t2 if 0 < t2 <= dt else None
+        t1 = t1 if 0 <= t1 <= dt else None
+        t2 = t2 if 0 <= t2 <= dt else None
 
     c1, c2 = Collision(disk1, disk2), Collision(disk2, disk1)
     if t1 is None and t2 is None:
