@@ -37,7 +37,7 @@ panning = False
 panning_start = None
 d1 = Disk(Point(20, 20), 2, 1, Vector(0, 0))
 d1.visuals.color = white
-d1.visuals.trail = Trail(1, 10)
+d1.visuals.trail = Trail(1, 100)
 d2 = Disk(Point(10, 10), 5, 5.97219e+14, Vector(0, 0))
 d2.visuals.color = white
 
