@@ -3,6 +3,9 @@ import pygame.gfxdraw
 from math import sqrt
 from vector import Vector
 from helpers import float_eq
+import logging
+
+logger = logging.getLogger('diskworld.world')
 
 class Collision(object):
     def __init__(self, disk, otherDisk):
@@ -61,7 +64,11 @@ def calculateCollision(disk1, disk2, dt):
     # of the two disks (centers_vector), it means the two disks are
     # not moving towards each other.
     if vr * centers_vector >= 0:
-        print "XXXXX", disk1.center, disk1.velocity, disk2.center, disk2.velocity
+        logger.debug('Not moving toward each other. No collision.')
+        logger.debug('Disk 1: position={} velocity={}'.format(
+            disk1.center, disk1.velocity))
+        logger.debug('Disk 2: position={} velocity={}'.format(
+            disk2.center, disk2.velocity))
         return None, None
 
     if disk1.isInContact(disk2):
@@ -108,8 +115,10 @@ class World(object):
             d.force = Vector(0, 0)
             d.collisions = []
 
-        print
-        print "force before:", [d.force for d in self.disks]
+        logger.debug('Integration:')
+        logger.debug('Forces at the beginning: {}'.format(
+            [d.force for d in self.disks]))
+
         # Calculate non-contact forces
         for d1, d2 in itertools.combinations(self.disks, 2):
             # gravity
@@ -117,43 +126,54 @@ class World(object):
             fg = (G * d1.mass * d2.mass) / (d2.center - d1.center).magnitude ** 2
             d1.force += Vector(angle=(d2.center - d1.center).angle, magnitude=fg)
             d2.force += Vector(angle=(d1.center - d2.center).angle, magnitude=fg)
-        print "force after:", [d.force for d in self.disks]
 
-        print "force before:", [d.force for d in self.disks]
+        logger.debug('Forces after adding non-contact forces: {}'.format(
+            [d.force for d in self.disks]))
+
         # Calculate contact forces
         for d1, d2 in itertools.combinations(self.disks, 2):
             # normal force
             if d1.isInContact(d2):
-                print "NNNNNNNNNNNNNNNNNN"
+                logger.debug('Applying contact force between disks: {} and {}'.format(d1, d1))
                 fy = d1.force.project(d2.center - d1.center)
                 d1.force -= fy
                 d2.force += fy
             else:
-                print "UUUUUUUUUUUUUUUUUUUUUN"
-        print "force after:", [d.force for d in self.disks]
+                logger.debug('No contact force between disks: {} and {}'.format(d1, d2))
 
-        print "accel. before:", [d.acceleration for d in self.disks]
+        logger.debug('Forces after adding contact forces: {}'.format(
+            [d.force for d in self.disks]))
+
+        logger.debug('Accelerations at the beginning: {}'.format(
+            [d.acceleration for d in self.disks]))
+
         # Calculate accelerations
         for d in self.disks:
             d.acceleration = d.force * (1.0 / d.mass)
-        print "accel. after:", [d.acceleration for d in self.disks]
 
-        print "vel. before:", [d.velocity for d in self.disks]
+        logger.debug('Accelerations after integration: {}'.format(
+            [d.acceleration for d in self.disks]))
+
+        logger.debug('Velocities at the beginning: {}'.format(
+            [d.velocity for d in self.disks]))
+
         # Calculate velocities
         for d in self.disks:
             d.velocity += d.acceleration * dt
-        print "vel. after:", [d.velocity for d in self.disks]
 
-        print "cols. before:", [d.collisions for d in self.disks]
+        logger.debug('Velocities after integration: {}'.format(
+            [d.velocity for d in self.disks]))
+
         # Calculate collisions
         for d1, d2 in itertools.combinations(self.disks, 2):
             c1, c2 = calculateCollision(d1, d2, dt)
             if c1 is not None:
                 d1.collisions.append(c1)
                 d2.collisions.append(c2)
-        print "cols. after:", [d.collisions for d in self.disks]
 
-        print "cols.before:", [d.collisions for d in self.disks]
+        logger.debug('Collisions: {}'.format(
+            [d.collisions for d in self.disks]))
+
         # Prune extra collisions; that is, remove collisions that are
         # happen after another collision and therefore will never
         # happen.
@@ -171,9 +191,16 @@ class World(object):
                 d.collisions = d.collisions[:i]
                 for c in rest:
                     c.other.collisions.remove(c)
-        print "cols. after:", [d.collisions for d in self.disks]
 
-        print "pos. before:", [d.center for d in self.disks]
+        logger.debug('Collisions after pruning: {}'.format(
+            [d.collisions for d in self.disks]))
+
+        logger.debug('Velocities after applying collisions: {}'.format(
+            [d.velocity for d in self.disks]))
+
+        logger.debug('Positions at the beginning: {}'.format(
+            [d.center for d in self.disks]))
+
         # Move the disks
         for d in self.disks:
             if len(d.collisions) > 0:
@@ -185,14 +212,17 @@ class World(object):
                     d.velocity += c.dv
             else:
                 d.center += d.velocity * dt
-        print "pos. after:", [d.center for d in self.disks]
-        print "vel. after:", [d.velocity for d in self.disks]
+
+        logger.debug('Positions after integration: {}'.format(
+            [d.center for d in self.disks]))
+
         for d in self.disks:
-            if len(d.collisions) > 0:
+            for c in d.collisions:
                 if not d.isInContact(c.other):
-                    print "FOOOOOOUUUUL: Collision detected, but no contact!"
-                    #exit(0)
+                    logger.warning('Collision without contact: {} and {}'.format(d, c.other))
+
         for d1, d2 in itertools.combinations(self.disks, 2):
             if abs(d2.center - d1.center) - (d1.radius + d2.radius) < 0.000001:
-                print "NOOOOOOOOOOOOOO!", abs(d2.center - d1.center), d1.radius + d2.radius, d1.collisions, d2.collisions
-                #exit(0)
+                logger.warning('Disks too close: {} and {}'.format(d1, d2))
+
+        logger.debug('End of integration process.')

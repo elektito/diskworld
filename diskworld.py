@@ -1,5 +1,6 @@
 import pygame
 import sys
+import logging
 from pygame.locals import *
 from disk import Disk
 from vector import Vector
@@ -7,6 +8,14 @@ from point import Point
 from world import World
 from camera import Camera
 from renderer import Renderer, Guide, Trail
+
+logger = logging.getLogger('diskworld')
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s')
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
+logger.setLevel(logging.DEBUG)
 
 def get_disk_from_surface_point(point, world, renderer):
     ret = None
@@ -56,7 +65,7 @@ while True:
 
     for event in pygame.event.get():
         if event.type == QUIT:
-            print "Going away!"
+            logger.info("Going away!")
             pygame.quit()
             sys.exit()
         elif event.type == MOUSEBUTTONDOWN:
@@ -121,7 +130,7 @@ while True:
                 world.update(timestep / 1000.0)
             if event.key == K_p:
                 paused = not paused
-                print "Paused." if paused else "Un-paused."
+                logger.info("Simulation paused." if paused else "Simulation un-paused.")
             if event.key == K_q:
                 pygame.event.post(pygame.event.Event(QUIT))
             if event.key == K_ESCAPE:
