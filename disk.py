@@ -1,6 +1,7 @@
 from math import sqrt, pi
 from vector import Vector
 from point import Point
+from helpers import float_eq
 
 class Visual:
     def __init__(self):
@@ -32,9 +33,11 @@ class Disk:
         return pi * self.radius ** 2
 
     def isInContact(self, disk):
-        distance = round(abs(self.center - disk.center))
-        R = round(self.radius + disk.radius)
-        return distance <= R
+        distance = abs(self.center - disk.center)
+        R = self.radius + disk.radius
+
+        # return distance <= R
+        return distance < R or float_eq(distance, R)
 
     def isInCollision(self, disk):
         # The vector from the center of the other disk to the center
