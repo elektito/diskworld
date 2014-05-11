@@ -164,9 +164,13 @@ coordinates and returns the results as a 2-tuple.'''
                 # Now draw the points in the trail. Start with a
                 # smaller radius (r) and alpha channel (a).
                 r = 2.0
+                _, _, r = self.calcDiskSurfaceMetrics(d.center, d.radius)
+                start_r = float(r) / 10
+                end_r = float(r) / 2
+                r = start_r
                 a = 128
                 if len(points) > 0:
-                    dr = 3.0 / len(points)
+                    dr = (end_r - start_r) / len(points)
                     da = (255 - a) / len(points)
                 for p in points:
                     x, y = self.worldToSurfaceCoord(p)
