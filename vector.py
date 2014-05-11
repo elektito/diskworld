@@ -1,5 +1,6 @@
 from math import sqrt, atan2, sin, cos
 from numbers import Number
+from helpers import float_eq
 
 class Vector:
     def __init__(self, x=None, y=None, magnitude=None, angle=None):
@@ -51,8 +52,7 @@ class Vector:
         if not isinstance(v2, Vector):
             raise TypeError("A vector can only be compared with another vector.")
 
-        return round(self.x) == round(v2.x) and \
-            round(self.y) == round(v2.y)
+        return float_eq(self.x, v2.x) and float_eq(self.y, v2.y)
 
     def __mul__(self, arg):
         if not isinstance(arg, (Vector, Number)):

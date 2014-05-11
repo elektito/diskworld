@@ -1,4 +1,5 @@
 from vector import Vector
+from helpers import float_eq
 
 class Point:
     def __init__(self, x, y):
@@ -37,7 +38,7 @@ class Point:
         if not isinstance(p, Point):
             raise TypeError("A point can only be compared with another point.")
 
-        return self.x == p.x and self.y == p.y
+        return float_eq(self.x, p.x) and float_eq(self.y, p.y)
 
     def __repr__(self):
         return "<Point ({}, {})>".format(self.x, self.y)
