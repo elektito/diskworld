@@ -7,12 +7,12 @@ from vector import Vector
 red = pygame.Color(255, 0, 0)
 black = pygame.Color(0, 0, 0)
 
-class Guide:
+class Guide(object):
     def __init__(self):
         self.start = None
         self.end = None
 
-class Trail:
+class Trail(object):
     def __init__(self, time=0, size=0):
         self.time = time
         self.size = size
@@ -21,7 +21,7 @@ class Trail:
     def clear(self):
         self.prev = []
 
-class Renderer:
+class Renderer(object):
     def __init__(self, world, camera, surface):
         self.world = world
         self.camera = camera

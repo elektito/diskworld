@@ -4,7 +4,7 @@ from math import sqrt
 from vector import Vector
 from helpers import float_eq
 
-class Collision:
+class Collision(object):
     def __init__(self, disk, otherDisk):
         self.disk = disk
         self.other = otherDisk
@@ -99,7 +99,7 @@ def calculateCollision(disk1, disk2, dt):
 
     return c1, c2
 
-class World:
+class World(object):
     def __init__(self):
         self.disks = []
 

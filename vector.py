@@ -2,7 +2,7 @@ from math import sqrt, atan2, sin, cos
 from numbers import Number
 from helpers import float_eq
 
-class Vector:
+class Vector(object):
     def __init__(self, x=None, y=None, magnitude=None, angle=None):
         if x is not None and y is not None:
             self.x = x

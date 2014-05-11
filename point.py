@@ -1,7 +1,7 @@
 from vector import Vector
 from helpers import float_eq
 
-class Point:
+class Point(object):
     def __init__(self, x, y):
         self.x = x
         self.y = y

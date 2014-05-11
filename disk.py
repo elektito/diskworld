@@ -3,13 +3,13 @@ from vector import Vector
 from point import Point
 from helpers import float_eq
 
-class Visual:
+class Visual(object):
     def __init__(self):
         self.color = None
         self.trail = None
         self.guide = None
 
-class Disk:
+class Disk(object):
     def __init__(self, center, radius, mass, velocity=Vector(0, 0)):
         if not isinstance(center, Point):
             raise TypeError('Disk center must be a point.')
