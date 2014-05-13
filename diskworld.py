@@ -9,13 +9,22 @@ from world import World
 from camera import Camera
 from renderer import Renderer, Guide, Trail
 
+class FilterIntegration(logging.Filter):
+    def filter(self, record):
+        return record.msg != 'Integration'
+
 logger = logging.getLogger('diskworld')
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s')
 console_handler.setFormatter(formatter)
+console_handler.addFilter(FilterIntegration())
 logger.addHandler(console_handler)
 logger.setLevel(logging.DEBUG)
+
+from handlers import IntegrationHandler
+ih = IntegrationHandler()
+logger.addHandler(ih)
 
 def get_disk_from_surface_point(point, world, renderer):
     ret = None
