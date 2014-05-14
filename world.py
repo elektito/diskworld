@@ -126,8 +126,8 @@ class World(object):
             # gravity
             G = 6.674e-11
             fg = (G * d1.mass * d2.mass) / (d2.center - d1.center).magnitude ** 2
-            d1.force += Vector(angle=(d2.center - d1.center).angle, magnitude=fg)
-            d2.force += Vector(angle=(d1.center - d2.center).angle, magnitude=fg)
+            d1.force += (d2.center - d1.center) / abs(d2.center - d1.center) * fg
+            d2.force += (d1.center - d2.center) / abs(d1.center - d2.center) * fg
 
         #logger.debug('Forces after adding non-contact forces: {}'.format(
         #    [d.force for d in self.disks]))
@@ -223,6 +223,25 @@ class World(object):
                 # Apply the impulses caused by the collisions
                 for c in d.collisions:
                     d.velocity += c.dv
+
+                # We've so far moved the disk for `toi` seconds and
+                # updated its velocity. But what to do with the rest
+                # of the time (dt - toi)?
+                #
+                # We _could_ let that go, but there will be
+                # complications. The main problem will be the fact
+                # that the ball will not decelerate in the next time
+                # step because of the normal force counteracting other
+                # forces.
+                #
+                # The other option is updating position and velocity
+                # for the "dt-toi" duration. This has other
+                # complications chief among them being the fact that
+                # the objects might not touch on screen. It seems the
+                # best trade-off is updating the velocity, but not the
+                # position.
+                ndt = dt - d.collisions[0].toi
+                d.velocity += d.acceleration * ndt
             else:
                 d.center += d.velocity * dt
 
