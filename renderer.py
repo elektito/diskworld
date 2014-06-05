@@ -137,7 +137,6 @@ coordinates and returns the results as a 2-tuple.'''
 
                     # From the rest we choose enough, as evenly timed
                     # as possible, to create a trail.
-                    allpoints = trail.prev[0:]
                     time = trail.prev[0][1]
                     step = float(trail.time) / trail.size
                     while len(points) < trail.size:
@@ -146,20 +145,17 @@ coordinates and returns the results as a 2-tuple.'''
                         # Go forward among previous locations until we
                         # reach one after `time`.
                         span = []
-                        i = 0
                         for pos, t in trail.prev[0:]:
-                            i += 1
-                            span.append((i, pos, t))
+                            span.append((pos, t))
                             if t >= time:
                                 break
 
                         # Choose the point as close to the time we want as possible
-                        p = min(span, key=lambda r: abs(time - r[2]))
-                        points.append(p[1])
+                        p = min(span, key=lambda r: abs(time - r[1]))
+                        points.append(p[0])
 
                         # Continue from this point
-                        allpoints = trail.prev[p[0]:]
-                        time = p[2]
+                        time = p[1]
 
                 # Now draw the points in the trail. Start with a
                 # smaller radius (r) and alpha channel (a).
